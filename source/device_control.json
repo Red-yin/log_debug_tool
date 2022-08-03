@@ -1,0 +1,48 @@
+{
+	"RECV DEVICE CTRL CMD":{
+		"INTENT PARAM ERROR":{
+			"extract":{
+				"statusInfo":"语音参数异常"
+			}
+		},
+		"1_001_01_01":{
+			"extract":{
+				"statusInfo":"房间不存在"
+			}
+		},
+		"1_001_01_02":{
+			"extract":{
+				"statusInfo":"楼层不存在"
+			}
+		},
+		"SEARCH DEVICE FAILED":{
+			"extract":{
+				"statusInfo":"搜索设备失败"
+			}
+		},
+		"DEVICE FILTER FAILED":{
+			"extract":{
+				"statusInfo":"没有符合控制条件的设备"
+			}
+		},
+		"CMD PRETREATMENT FAILED":{
+			"extract":{
+				"statusInfo":"控制命令和设备类型不匹配"
+			}
+		},
+		"CTRL DEV NUM :":{
+			"device ctrl:":{
+				"ctrl errCode: 0":{
+					"extract":{
+						"statusInfo":"控制成功"
+					}
+				},
+				"control error:":{
+					"extract":{
+						"statusInfo":"控制失败"
+					}
+				}
+			}
+		}
+	}
+}
