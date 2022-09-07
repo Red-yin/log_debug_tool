@@ -26,12 +26,12 @@ class FileConvert:
             if 'title' not in item:
                 print(item, "has no title")
                 continue
-            print(item['title'])
+            #print(item['title'])
             if 'topics' in item:
                 ret[item['title']] = self._get_xmind_info(item['topics'])
             else:
                 ret[item['title']] = self._get_xmind_default_info(item)
-            print(ret)
+            #print(ret)
         return ret
 
     def xmind2json(self, input, output):
@@ -42,7 +42,7 @@ class FileConvert:
             json_data = dict()
             for item in data:
                 json_data = self._get_xmind_info(item['topic']['topics'])
-            print(json_data)
+            #print(json_data)
             with open(output, 'w', encoding='utf-8') as f:
                 f.write(json.dumps(json_data, ensure_ascii=False))
         except Exception as e:

@@ -7,6 +7,8 @@ import queue
 import time
 import sys
 
+from xmind2json import FileConvert
+
 class LogAnalysis:
     def __init__(self, file_path, queue=None):
         self.file_path = file_path 
@@ -40,7 +42,7 @@ class LogAnalysis:
 
     def log_analysis_end(self):
         if "extract" in self.current_position:
-            print(self.current_position['extract']['statusInfo'])
+            print("result:", self.current_position['extract']['statusInfo'])
         self.update_current_position()
 
     def update_current_position(self, key=None):
@@ -125,6 +127,8 @@ if __name__=="__main__":
         print("usage: log_analysis file")
         exit()
 
+    fc = FileConvert()
+    fc.xmind2json("./source/device_control.xmind", "./source/device_control.json")
     q = queue.Queue(10240)
 
     if sys.argv[1] == "adb":
@@ -137,7 +141,7 @@ if __name__=="__main__":
         file_log = FileDataRead(file_path, queue=q)
         file_log.run()
 
-    source_path = sys.argv[0].rsplit('/', 1)[0] + "/source/device_control.json"
+    source_path = "./source/device_control.json"
     print("source_path ", source_path)
     analysis = LogAnalysis(source_path, q)
     start_time = time.time()

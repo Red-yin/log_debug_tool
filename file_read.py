@@ -11,7 +11,7 @@ class FileDataRead:
 
     def _dataHandle(self):
         try:
-            self.handle = open(self.file_path)
+            self.handle = open(self.file_path, encoding="utf-8")
         except Exception as e:
             print(e)
             exit(1)
@@ -37,7 +37,7 @@ class FileDataRead:
                             word[1](word[2])
                 elif self.queue is not None:
                     try:
-                        #self.queue.put(str(data_str,encoding='utf-8',errors='ignore'), block=False)
+                        #self.queue.put(str(data_str,encoding='utf-8',errors='ignore'), block=True)
                         self.queue.put(data_str, block=True)
                     except queue.Full:
                         print("ERROR: ", self.queue.maxsize, " is full")
