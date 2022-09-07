@@ -1,7 +1,6 @@
 #!/usr/bin/python3
 import subprocess
 import threading
-import time
 import queue
 
 class AdbDataHandle:
