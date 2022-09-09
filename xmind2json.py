@@ -34,19 +34,24 @@ class FileConvert:
             #print(ret)
         return ret
 
-    def xmind2json(self, input, output):
+    def xmind2json(self, input):
         try:
             workbook = xmind.load(input)
             data = workbook.getData()
             #print(data)
-            json_data = dict()
+            self.json_data = dict()
             for item in data:
-                json_data = self._get_xmind_info(item['topic']['topics'])
+                self.json_data = self._get_xmind_info(item['topic']['topics'])
             #print(json_data)
-            with open(output, 'w', encoding='utf-8') as f:
-                f.write(json.dumps(json_data, ensure_ascii=False))
+            return self.json_data
         except Exception as e:
             print(input, "convert to json failed: ", e)
+    def save(self, output):
+        try:
+            with open(output, 'w', encoding='utf-8') as f:
+                f.write(json.dumps(self.json_data, ensure_ascii=False))
+        except Exception as e:
+            print(input, "save failed: ", e)
 
 #workbook = xmind.load("./test.xmind")
 #data = workbook.getData()
@@ -59,4 +64,5 @@ if __name__=="__main__":
         exit()
 
     fc = FileConvert()
-    fc.xmind2json(sys.argv[1], sys.argv[2])
+    fc.xmind2json(sys.argv[1])
+    fc.save(sys.argv[2])

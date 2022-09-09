@@ -1,0 +1,6 @@
+line number: 3978, time use: 0.015957355499267578s, time use per line:4.011401583526289us
+line number: 3978, time use: 0.015957117080688477s, time use per line:4.011341649242955us
+line number: 3978, time use: 0.015608549118041992s, time use per line:3.923717727009048us
+line number: 359617, time use: 1.3894543647766113s, time use per line:3.863706011608493us
+line number: 7604883, time use: 27.951346397399902s, time use per line:3.675447261634387us
+line number: 7604883, time use: 27.85118556022644s, time use per line:3.6622766662191175us
