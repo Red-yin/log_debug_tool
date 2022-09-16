@@ -1,7 +1,6 @@
 import sys
 
 def get_file_name(file_path: str):
-    print(file_path)
     if sys.platform.startswith('win'):
         return file_path.split('/')[-1]
     elif sys.platform.startswith('linux'):

@@ -1,27 +1,26 @@
-"""
-#功能说明：运行后显示弹窗，鼠标点击文件后，获取到文件路径
-from PySide2.QtWidgets import QApplication, QMainWindow, QFileDialog
-app = QApplication([])
-fileDir = QFileDialog.getOpenFileNames(QMainWindow(), "test")
-print(fileDir)
-"""
 from audioop import add
 from cgi import test
 from fileinput import filelineno
+from genericpath import exists
+from urllib.response import addbase
 from PySide2.QtWidgets import QApplication, QMainWindow, QAction, QDesktopWidget
 from PySide2.QtWidgets import QBoxLayout, QGridLayout, QVBoxLayout, QHBoxLayout
-from PySide2.QtWidgets import QPushButton, QLabel
+from PySide2.QtWidgets import QPushButton, QLabel, QComboBox
 from PySide2.QtWidgets import QFrame, QFileDialog
 import sys, os
 from PySide2.QtGui import QIcon
 from PySide2.QtUiTools import QUiLoader
 from PySide2.QtCore import Qt
+import queue
 
 from window_xmind2json import Window_Xmind2json
+from result_display import ResultDisplayWindow
 parent_path = os.path.dirname(sys.path[0])
 if parent_path not in sys.path:
      sys.path.append(parent_path)
 import my_util
+from adb_run import AdbDataHandle
+from log_analysis import LogAnalysis
 
 class Window(QMainWindow):
     def __init__(self):
@@ -48,14 +47,31 @@ class Window(QMainWindow):
                 if item is not None and item.layout() is not None and item.layout().count() > 1:
                     print("count:", item.layout().count())
                     print("text:", item.layout().itemAt(1).widget().toolTip())
+                    self.plug_list.add(item.layout().itemAt(1).widget().toolTip())
+        print(self.plug_list)
+        self.start_read_data()
+        #self.start_feed_data()
+        self.log_analysis_window()
 
+    def start_read_data(self):
+        self.analysis = LogAnalysis(self.plug_list.pop())
+        self.q = queue.Queue(10240)
+        if self.ui.comboBox.currentText() == 'adb':
+            cmd = 'adb shell tail -F /tmp/orb.log'
+            self.adb_log = AdbDataHandle(cmd, queue=self.q)
+            self.adb_log.run()
+        elif self.ui.comboBox.currentText() == 'file':
+            pass
+
+    def log_analysis_window(self):
+        self.result_window = ResultDisplayWindow(self.q, self.analysis)
+        self.result_window.ui.show()
 
     def create_plug_layout(self):
         self.ui.label_2.setAlignment(Qt.AlignCenter)
         #self.ui.frame.setStyleSheet('border-width: 1px;border-style: solid;border-color: rgb(255, 170, 0);')
         self.ui.pushButton.clicked.connect(self.choose_file)
-        self.plug_files = list()
-        self.plug_matrix = list()
+        self.plug_list = set()
 
     #删除按键触发所在的组件，移动“添加”按键位置
     def delete_item(self):
@@ -76,28 +92,26 @@ class Window(QMainWindow):
             else:
                 continue
             break
+        #删除layout时，需要把layout下所有的widget清空
         clicked_item = self.ui.gridLayout.itemAtPosition(clicked_row, clicked_column)
-        #clicked_item.setParent(None)
-        clicked_item.deleteLater()
+        for i in range(clicked_item.count()):
+            child = clicked_item.itemAt(i).widget()
+            if child:
+                child.deleteLater()
+        #只有通过被删除layout的上一层级调用removeItem才能删掉layout，否则在清空layout下的widget后，layout仍然会保留，影响当前位置的布局
+        self.ui.gridLayout.removeItem(clicked_item)
+        clicked_item.setParent(None)
         bottom_btn = self.ui.gridLayout.itemAtPosition(clicked_row+1, clicked_column)
         self.ui.gridLayout.addWidget(bottom_btn.widget(), clicked_row, clicked_column)
         if clicked_row == 0:
             right_btn = self.ui.gridLayout.itemAtPosition(clicked_row, clicked_column+1)
-            right_btn.widget().setParent(None)
-       
-        """
-        print("btn name:",self.sender())
-        index = self.ui.gridLayout.indexOf(self.sender().parent())
-        print("index:", index)
-        position = self.ui.gridLayout.getItemPosition(index)
-        print(position)
-         """
+            right_btn.widget().deleteLater()
 
     #获取插件文件路径并显示，增加“添加”按键，支持横向和纵向添加文件
     def add_item(self, file_path:str):
         item_box = QHBoxLayout()
         item_box.setObjectName("file display box")
-        delete_btn = QPushButton("x")
+        delete_btn = QPushButton("-")
         delete_btn.setObjectName("delete button")
         delete_btn.clicked.connect(self.delete_item)
         file_lable = QLabel(my_util.get_file_name(file_path))
@@ -107,10 +121,13 @@ class Window(QMainWindow):
         item_box.addWidget(file_lable)
         index = self.ui.gridLayout.indexOf(self.sender())
         position = self.ui.gridLayout.getItemPosition(index)
+        print("add item in position: ", position)
         clicked_btn = self.ui.gridLayout.itemAtPosition(position[0], position[1])
-        #self.ui.gridLayout.addItem(item_box, position[0], position[1], 1, 1)
+        print("click btn:", clicked_btn)
+        print("add layout in position: ", position)
         self.ui.gridLayout.addLayout(item_box, position[0], position[1])
         #self.ui.gridLayout.addItem(clicked_btn, position[0]+1, position[1], 1, 1)
+        print("add layout in position: ", position)
         self.ui.gridLayout.addWidget(clicked_btn.widget(), position[0]+1, position[1])
         if position[0] == 0:
             print("add btn: ", position[0], position[1])
@@ -140,10 +157,13 @@ class Window(QMainWindow):
 
     #设置主窗帘位置到屏幕中央
     def center(self):
+        self.setCentralWidget(QDesktopWidget())
+        """
         qRect = self.frameGeometry()
         centerPoint = QDesktopWidget().availableGeometry().center()
         qRect.moveCenter(centerPoint)
         self.ui.move(qRect.topLeft())
+        """
 
 myApp = QApplication([])
 window = Window()

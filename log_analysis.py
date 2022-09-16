@@ -28,9 +28,10 @@ class LogAnalysis:
                 if ret != -1:
                     print(line_str)
                     self.update_current_position(key)
-                    break
+                    return key
         else:
             self.log_analysis_end()
+        return None
 
     def __get_position_keys(self, position):
         default_keys = ["eof_info", "box", "next", "extract"]

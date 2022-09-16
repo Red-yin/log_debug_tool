@@ -64,5 +64,6 @@ if __name__=="__main__":
         exit()
 
     fc = FileConvert()
+    print(sys.argv[1])
     fc.xmind2json(sys.argv[1])
     fc.save(sys.argv[2])
