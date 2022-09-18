@@ -32,6 +32,7 @@ class ResultDisplayWindow(QDialog):
             count = count + 1
             if log_str != 'EOF':
                 ret = self.analysis.log_analysis(log_str)
+                self.ui.textBrowser_2.append(log_str)
                 if ret != None:
                     self.ui.textBrowser.append(ret + ":" + log_str)
             else:
