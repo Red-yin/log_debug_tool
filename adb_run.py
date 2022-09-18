@@ -1,4 +1,5 @@
 #!/usr/bin/python3
+from codecs import ignore_errors
 import subprocess
 import threading
 import queue
@@ -18,7 +19,7 @@ class AdbDataHandle:
 
         adbstr = self.handle.stdout.readline()
         print('read:', adbstr)
-        ret = str(adbstr, encoding='utf-8').find('error')
+        ret = str(adbstr, encoding='utf-8', errors='ignore').find('error')
         if ret != -1:
             print("command error")
             exit(1)

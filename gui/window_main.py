@@ -49,12 +49,15 @@ class Window(QMainWindow):
                     print("text:", item.layout().itemAt(1).widget().toolTip())
                     self.plug_list.add(item.layout().itemAt(1).widget().toolTip())
         print(self.plug_list)
-        self.start_read_data()
         #self.start_feed_data()
         self.log_analysis_window()
 
-    def start_read_data(self):
-        self.analysis = LogAnalysis(self.plug_list.pop())
+    def log_analysis_window(self):
+        if self.plug_list:
+            self.analysis = LogAnalysis(self.plug_list.pop())
+        else:
+            print("no plug !")
+            return
         self.q = queue.Queue(10240)
         if self.ui.comboBox.currentText() == 'adb':
             cmd = 'adb shell tail -F /tmp/orb.log'
@@ -63,7 +66,6 @@ class Window(QMainWindow):
         elif self.ui.comboBox.currentText() == 'file':
             pass
 
-    def log_analysis_window(self):
         self.result_window = ResultDisplayWindow(self.q, self.analysis)
         self.result_window.ui.show()
 
