@@ -3,12 +3,30 @@ import subprocess
 import threading
 import queue
 
-class FileDataRead:
-    def __init__(self, file_path, keyWords=None, queue=None):
-        self.file_path = file_path
-        self.keyWords = keyWords
-        self.queue = queue
+from data_input import DataInput
 
+class FileDataRead(DataInput):
+    def __init__(self, file_path = None):
+        super().__init__(args=file_path)
+
+    def init(self, file_path):
+        if file_path == None:
+            return
+        self.set_file_path(file_path)
+
+    def read(self):
+        data_str = self.handle.readline()
+        if not data_str:
+            data_str = 'EOF'
+        return data_str
+
+    def set_file_path(self, file_path):
+        try:
+            self.handle = open(file_path, 'r', encoding="utf-8", errors='ignore')
+        except Exception as e:
+            print(e)
+    
+    """
     def _dataHandle(self):
         try:
             self.handle = open(self.file_path, encoding="utf-8")
@@ -50,6 +68,7 @@ class FileDataRead:
         t = threading.Thread(target=self._dataHandle)
         t.setDaemon(True)
         t.start()
+    """
 
 def test(val):
     val += 1

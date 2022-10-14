@@ -1,5 +1,6 @@
 #!/usr/bin/python3
 
+from fileinput import filelineno
 from adb_run import AdbDataHandle
 from file_read import FileDataRead
 import json
@@ -9,43 +10,47 @@ import sys
 
 from xmind2json import FileConvert
 
-class LogAnalysis:
-    def __init__(self, file_path, queue=None):
-        self.file_path = file_path 
+class AnalysisConfig:
+    def __init__(self, file_path) -> None:
+        self.file_path = file_path
         self.log_data = self.analysis_source_load(file_path)
         self.update_current_position()
-        self.queue = queue
-    
-    def log_analysis(self, line_str):
-        key_list = self.__get_position_keys(self.current_position)
+
+    def analysis(self, content:str):
+        key_list = self.get_current_keys()
         #print(key_list)
-        if len(key_list) > 0:
-            #获取trigger关键字
-            if self.current_position != self.log_data:
-                key_list += self.__get_position_keys(self.log_data)
-            for key in key_list:
-                ret = line_str.find(key)
-                if ret != -1:
-                    print(line_str)
-                    self.update_current_position(key)
-                    return key
-        else:
+        if len(key_list) == 0:
             self.log_analysis_end()
+            key_list = self.get_current_keys()
+        for key in key_list:
+            ret = content.find(key)
+            #结果分类：1.content不包含key；
+            # 2.content包含key，且key是最终的成功结果；
+            # 3.content包含key，且key是最终的失败结果；
+            # 4.content包含key，且key是中间节点；
+            if ret != -1:
+                print(content)
+                self.update_current_position(key)
+                if self.is_position_end():
+                    #结果分类2和3
+                    ret = dict()
+                    ret['key'] = key
+                    ret['result'] = self.current_result()
+                    return ret
+                else:
+                    #结果分类4
+                    ret = dict()
+                    ret['key'] = key
+                    return ret
+        #结果分类1
         return None
 
-    def __get_position_keys(self, position):
-        default_keys = ["eof_info", "box", "next", "extract"]
-        ret = list()
-        for k in position:
-            if k not in default_keys:
-                ret.append(k)
-        return ret
-
-    def log_analysis_end(self):
-        if "extract" in self.current_position:
-            print("result:", self.current_position['extract']['statusInfo'])
-        self.update_current_position()
-
+    def is_position_end(self) -> bool:
+        key_list = self.get_current_keys()
+        if len(key_list) > 0:
+            return False
+        else:
+            return True
     def update_current_position(self, key=None):
         if key == None:
             self.current_position = self.log_data
@@ -60,7 +65,6 @@ class LogAnalysis:
                 self.current_position = self.log_data[key]
             else:
                 print("ERROR:", key, "is not exist in ", self.current_position)
-
     def analysis_source_load(self, file_path):
         data = self.__data_loader(file_path)
         return data
@@ -68,6 +72,32 @@ class LogAnalysis:
             return data
         else:
             return None
+
+    def get_current_keys(self):
+        key_list = self.__get_position_keys(self.current_position)
+        if len(key_list) > 0 and self.current_position != self.log_data:
+            #获取trigger关键字
+            key_list += self.__get_position_keys(self.log_data)
+        return key_list 
+
+    def get_trigger_keys(self):
+        return self.__get_position_keys(self.log_data)
+
+    def __get_position_keys(self, position):
+        default_keys = ["eof_info", "box", "next", "extract"]
+        ret = list()
+        for k in position:
+            if k not in default_keys:
+                ret.append(k)
+        return ret
+
+    def current_result(self):
+        return self.current_position['extract']
+
+    def log_analysis_end(self):
+        if "extract" in self.current_position:
+            print("result:", self.current_position['extract']['statusInfo'])
+        self.update_current_position()
 
     def __data_loader(self, file_path):
         with open(file_path, 'r', errors='ignore', encoding='utf-8') as f:
@@ -118,12 +148,51 @@ class LogAnalysis:
                 return -1
         return 0
 
-    def run(self):
-        log_str = self.queue.get()
-        self.log_analysis(log_str)
 
+class LogAnalysis:
+    def __init__(self, file_list:list):
+        self.file_list = file_list
+        self.plug_list = list()
+        self.log_plug_update(0)
+        self.step_result = None
+    
+    def log_plug_update(self, index):
+        if index >= len(self.plug_list):
+            print(index, "is out of range")
+            return
+        self.plug_list.clear()
+        self.file_list_index = index
+        for f in self.file_list[self.file_list_index]:
+            self.plug_list.append(AnalysisConfig(f))
+
+    def log_analysis(self, line_str):
+        #print("INPUT DATA: ", line_str)
+        for plug in self.plug_list:
+            result = plug.analysis(line_str)
+            if result != None:
+                self.step_result = result
+                print("analysis result: ", result)
+                break
+        if self.step_result == None:
+            return None
+        elif 'result' in self.step_result and self.step_result['result']['statusInfo'] == 0:
+            #插件运行一轮结束，结果为成功；更新plug_list到下一个
+            self.file_list_index += 1
+            if self.file_list_index >= len(self.file_list):
+                #插件列表已经到结尾，从头开始
+                self.file_list_index = 0
+            self.log_plug_update(self.file_list_index)
+        elif 'result' in self.step_result and self.step_result['result']['statusInfo'] != 0:
+            #插件运行一轮结束，结果为失败；一轮整体分析流程结束，从头开始
+            self.file_list_index = 0
+            self.log_plug_update(self.file_list_index)
+        elif 'key' in self.step_result:
+            #命中了此插件的一个流程分支，但是未到最终流程
+            pass
+        return self.step_result
 
 if __name__=="__main__":
+    """
     if len(sys.argv) < 2:
         print("usage: log_analysis file")
         exit()
@@ -141,10 +210,18 @@ if __name__=="__main__":
         file_path = sys.argv[1]
         file_log = FileDataRead(file_path, queue=q)
         file_log.run()
+    """
+    file_path = "./log_dir/orb.log"
+    file_log = FileDataRead(file_path)
+    file_log.run()
 
     source_path = "./source/device_control.json"
     print("source_path ", source_path)
-    analysis = LogAnalysis(source_path, q)
+    param = list()
+    first_node = set()
+    first_node.add(source_path)
+    param.append(first_node)
+    analysis = LogAnalysis(param)
     start_time = time.time()
     count = 0
     fd = open("./time_test.txt", "a+")
@@ -152,7 +229,7 @@ if __name__=="__main__":
         """
         analysis.run()
         """
-        log_str = q.get()
+        log_str = file_log.get()
         count = count + 1
         if log_str != 'EOF':
             analysis.log_analysis(log_str)

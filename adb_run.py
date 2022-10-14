@@ -3,20 +3,33 @@ from codecs import ignore_errors
 import subprocess
 import threading
 import queue
+from data_input import DataInput
 
-class AdbDataHandle:
-    def __init__(self, cmd, keyWords=None, queue=None):
-        self.cmd = cmd
-        self.keyWords = keyWords
-        self.queue = queue
+class AdbDataHandle(DataInput):
+    def __init__(self, cmd):
+        super().__init__(args=cmd)
 
-    def _dataHandle(self):
+    def read(self):
+        return str(self.handle.stdout.readline(),encoding='utf-8',errors='ignore')
+
+    def deinit(self):
+        self.handle.terminate()
+        print("run terminate")
+
+    def init(self, args):
         try:
-            self.handle = subprocess.Popen(args=self.cmd, stdin=None, stdout=subprocess.PIPE, stderr=subprocess.STDOUT, shell=True)
+            self.handle = subprocess.Popen(args=args, stdin=None, stdout=subprocess.PIPE, stderr=subprocess.STDOUT, shell=True)
         except Exception as e:
-            print(e)
+            print("adb exception:", e)
             exit(1)
-
+        adbstr = self.handle.stdout.readline()
+        print('read:', adbstr)
+        ret = str(adbstr, encoding='utf-8', errors='ignore').find('error')
+        if ret != -1:
+            print("command error")
+            exit(1)
+    """
+    def _dataHandle(self):
         adbstr = self.handle.stdout.readline()
         print('read:', adbstr)
         ret = str(adbstr, encoding='utf-8', errors='ignore').find('error')
@@ -43,7 +56,7 @@ class AdbDataHandle:
         t.setDaemon(True)
         t.start()
         #self._dataHandle()
-
+    """
 def test(val):
     val += 1
     print('adb data test: ', val)

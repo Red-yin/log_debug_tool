@@ -1,8 +1,3 @@
-from audioop import add
-from cgi import test
-from fileinput import filelineno
-from genericpath import exists
-from urllib.response import addbase
 from PySide2.QtWidgets import QApplication, QMainWindow, QAction, QDesktopWidget
 from PySide2.QtWidgets import QBoxLayout, QGridLayout, QVBoxLayout, QHBoxLayout
 from PySide2.QtWidgets import QPushButton, QLabel, QComboBox
@@ -11,7 +6,6 @@ import sys, os
 from PySide2.QtGui import QIcon
 from PySide2.QtUiTools import QUiLoader
 from PySide2.QtCore import Qt
-import queue
 
 from window_xmind2json import Window_Xmind2json
 from result_display import ResultDisplayWindow
@@ -21,6 +15,7 @@ if parent_path not in sys.path:
 import my_util
 from adb_run import AdbDataHandle
 from log_analysis import LogAnalysis
+from file_read import FileDataRead
 
 class Window(QMainWindow):
     def __init__(self):
@@ -37,6 +32,8 @@ class Window(QMainWindow):
         self.ui.setWindowTitle("日志分析")
         self.create_plug_layout()
         self.ui.pushButton_3.clicked.connect(self.start_log_analysis)
+        #self.ui.comboBox.currentIndexChanged.connect(self.choose_input)
+        #self.ui.comboBox.activated.connect(self.choose_input)
 
     def start_log_analysis(self):
         column = self.ui.gridLayout.columnCount()
@@ -58,15 +55,17 @@ class Window(QMainWindow):
         else:
             print("no plug !")
             return
-        self.q = queue.Queue(10240)
+
         if self.ui.comboBox.currentText() == 'adb':
             cmd = 'adb shell tail -F /tmp/orb.log'
-            self.adb_log = AdbDataHandle(cmd, queue=self.q)
-            self.adb_log.run()
-        elif self.ui.comboBox.currentText() == 'file':
-            pass
+            self.data_source = AdbDataHandle(cmd)
+            self.data_source.run()
+        elif self.ui.comboBox.currentText() == 'files':
+            self.data_source = FileDataRead()
 
-        self.result_window = ResultDisplayWindow(self.q, self.analysis)
+        self.result_window = ResultDisplayWindow(self.data_source, self.analysis)
+        self.result_window.set_input_type(self.ui.comboBox.currentText())
+
         self.result_window.ui.show()
 
     def create_plug_layout(self):
@@ -143,6 +142,16 @@ class Window(QMainWindow):
         print(fileDir[0][0])
         self.file_path = fileDir[0][0]
         self.add_item(fileDir[0][0])
+
+    def choose_input(self):
+        if self.ui.comboBox.currentText() == 'adb':
+            print("adb choosed")
+            pass
+        elif self.ui.comboBox.currentText() == 'files':
+            print("file choosed")
+            file_dir = QFileDialog.getOpenFileNames(self.ui, "choose file")
+            self.source_file = file_dir[0][0]
+            print("source file:", self.source_file)
 
     def create_menu(self):
         mainMenu = self.ui.menuBar()

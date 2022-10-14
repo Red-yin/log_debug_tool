@@ -1,16 +1,21 @@
 from PySide2.QtUiTools import QUiLoader
 from PySide2.QtWidgets import *
+from PySide2.QtWidgets import QApplication, QWidget, QTextEdit, QPushButton, QMessageBox, QVBoxLayout
+from PySide2.QtGui import QCloseEvent
+from PySide2.QtCore import QThread
 import sys, os
 import threading
 import time
 import queue
+from data_input import DataInput
 
 from log_analysis import LogAnalysis
 
-class ResultDisplayWindow(QDialog):
-    def __init__(self, queue:queue, analysis:LogAnalysis):
+class ResultDisplayWindow(QWidget, QThread):
+    def __init__(self, data_source:DataInput, analysis:LogAnalysis):
         super().__init__()
-        self.q = queue
+        QThread.__init__(self)
+        self.data_source = data_source
         self.analysis = analysis
         self.create_main()
 
@@ -20,15 +25,34 @@ class ResultDisplayWindow(QDialog):
         self.ui.setMinimumWidth(800)
         self.ui.textBrowser.setMinimumWidth(600)
         self.ui.textBrowser.append("append test")
-        t = threading.Thread(target=self.update_text_display)
-        t.setDaemon(True)
-        t.start()
+        self.ui.pushButton_5.clicked.connect(self.choose_input)
+        self.start()
+        #t = threading.Thread(target=self.update_text_display)
+        #t.setDaemon(True)
+        #t.start()
 
-    def update_text_display(self):
+    def closeEvent(self, event:QCloseEvent):
+        print("close event")
+        event.accept()
+
+    def choose_input(self):
+        if self.input_type == "files":
+            fileDir = QFileDialog.getOpenFileNames(self.ui, "choose file")
+            print(fileDir[0][0])
+            self.data_source.set_file_path(fileDir[0][0])
+            self.data_source.run()
+        elif self.input_type == "adb":
+            pass
+
+    def set_input_type(self, type):
+        self.input_type = type
+        self.ui.pushButton_5.setText(type)
+
+    def run(self):
         start_time = time.time()
         count = 0
         while True:
-            log_str = self.q.get()
+            log_str = self.data_source.get()
             count = count + 1
             if log_str != 'EOF':
                 ret = self.analysis.log_analysis(log_str)
