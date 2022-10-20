@@ -157,7 +157,7 @@ class LogAnalysis:
         self.step_result = None
     
     def log_plug_update(self, index):
-        if index >= len(self.plug_list):
+        if index >= len(self.file_list):
             print(index, "is out of range")
             return
         self.plug_list.clear()

@@ -1,4 +1,3 @@
-
 import queue
 import threading
 import time
@@ -13,25 +12,30 @@ class Task:
         self.state = "idle"
         self.analysis = proc
         self.data_input = data_input
+        self.output_queue = queue.Queue(10240)
+        self.event = threading.Event()
 
+        self.start_task()
+    def get_task_result(self):
+        return self.output_queue.get(block=True)
+    def pause(self):
+        self.state = "pause"
+        self.data_input.pause()
+    def stop(self):
+        self.state = "stop"
+        print("data input quit")
+        self.data_input.quit()
+        print("event send")
+        self.event.set()
+        print("thread join")
+        self.t.join()
+        print("end")
+    def start_task(self):
+        self.state = "start"
         self.t = threading.Thread(target=self._run)
         self.t.setDaemon(True)
         self.t.start()
-        self.event = threading.Event()
-        self.output_queue = queue.Queue(10240)
-    def get_task_result(self):
-        return self.output_queue.get()
-    def pause_task(self):
-        self.state = "pause"
-        self.data_input.pause()
-    def stop_task(self):
-        self.state = "stop"
-        self.data_input.quit()
-        self.event.set()
-    def start_task(self):
-        self.state = "start"
-        return 0
-    def resume_task(self):
+    def resume(self):
         self.state = "resume"
         self.data_input.resume()
     def set_name(self, name:str):
@@ -49,10 +53,13 @@ class Task:
                 print("task stoped")
                 break
             log_str = self.data_input.get()
+            #print("task recv: ", log_str)
             count = count + 1
             if log_str != 'EOF':
                 try:
-                    self.output_queue.put(self.analysis.log_analysis(log_str))
+                    result = self.analysis.log_analysis(log_str)
+                    if result is not None:
+                        self.output_queue.put(result)
                 except queue.Full:
                     print("ERROR: ", self.queue.maxsize, " is full")
             else:

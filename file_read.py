@@ -6,8 +6,8 @@ import queue
 from data_input import DataInput
 
 class FileDataRead(DataInput):
-    def __init__(self, file_path = None):
-        super().__init__(args=file_path)
+    def __init__(self):
+        super().__init__()
 
     def init(self, file_path):
         if file_path == None:

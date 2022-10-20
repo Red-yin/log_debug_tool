@@ -6,6 +6,7 @@ import sys, os
 from PySide2.QtGui import QIcon
 from PySide2.QtUiTools import QUiLoader
 from PySide2.QtCore import Qt
+from test import TestWindow
 
 from window_xmind2json import Window_Xmind2json
 from result_display import ResultDisplayWindow
@@ -16,6 +17,7 @@ import my_util
 from adb_run import AdbDataHandle
 from log_analysis import LogAnalysis
 from file_read import FileDataRead
+from task_manage import Task
 
 class Window(QMainWindow):
     def __init__(self):
@@ -36,43 +38,55 @@ class Window(QMainWindow):
         #self.ui.comboBox.activated.connect(self.choose_input)
 
     def start_log_analysis(self):
+        self.plug_list = list()
         column = self.ui.gridLayout.columnCount()
         row = self.ui.gridLayout.rowCount()
         for c in range(column):
+            plug_group = set()
             for r in range(row):
                 item = self.ui.gridLayout.itemAtPosition(r, c)
                 if item is not None and item.layout() is not None and item.layout().count() > 1:
                     print("count:", item.layout().count())
                     print("text:", item.layout().itemAt(1).widget().toolTip())
-                    self.plug_list.add(item.layout().itemAt(1).widget().toolTip())
+                    plug_group.add(item.layout().itemAt(1).widget().toolTip())
+            if len(plug_group) > 0:
+                self.plug_list.append(plug_group)
         print(self.plug_list)
         #self.start_feed_data()
         self.log_analysis_window()
 
     def log_analysis_window(self):
-        if self.plug_list:
-            self.analysis = LogAnalysis(self.plug_list.pop())
-        else:
-            print("no plug !")
-            return
+        self.task = self.create_task(self.plug_list, self.ui.comboBox.currentText())
 
-        if self.ui.comboBox.currentText() == 'adb':
-            cmd = 'adb shell tail -F /tmp/orb.log'
-            self.data_source = AdbDataHandle(cmd)
-            self.data_source.run()
-        elif self.ui.comboBox.currentText() == 'files':
-            self.data_source = FileDataRead()
-
-        self.result_window = ResultDisplayWindow(self.data_source, self.analysis)
+        self.result_window = ResultDisplayWindow(self.task)
         self.result_window.set_input_type(self.ui.comboBox.currentText())
+        self.result_window.show()
 
-        self.result_window.ui.show()
+    def create_task(self, plug_list: list, data_input_type: str):
+        if plug_list is None:
+            print("create Task failed: plug_list is None")
+            return None
+
+        analysis = LogAnalysis(plug_list)
+        data_source = None
+        if data_input_type == 'adb':
+            cmd = 'adb shell tail -F /tmp/orb.log'
+            data_source = AdbDataHandle()
+            data_source.init(cmd)
+            data_source.start()
+        elif data_input_type == 'files':
+            data_source = FileDataRead()
+        else:
+            print("create Task failed:", data_input_type, "is not exist")
+            return None
+
+        task = Task(analysis, data_source)
+        return task
 
     def create_plug_layout(self):
         self.ui.label_2.setAlignment(Qt.AlignCenter)
         #self.ui.frame.setStyleSheet('border-width: 1px;border-style: solid;border-color: rgb(255, 170, 0);')
         self.ui.pushButton.clicked.connect(self.choose_file)
-        self.plug_list = set()
 
     #删除按键触发所在的组件，移动“添加”按键位置
     def delete_item(self):

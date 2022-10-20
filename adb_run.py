@@ -6,8 +6,8 @@ import queue
 from data_input import DataInput
 
 class AdbDataHandle(DataInput):
-    def __init__(self, cmd):
-        super().__init__(args=cmd)
+    def __init__(self):
+        super().__init__()
 
     def read(self):
         return str(self.handle.stdout.readline(),encoding='utf-8',errors='ignore')
