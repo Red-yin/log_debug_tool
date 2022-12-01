@@ -8,7 +8,7 @@ import queue
 import time
 import sys
 
-from xmind2json import FileConvert
+#from xmind2json import FileConvert
 
 class AnalysisConfig:
     def __init__(self, file_path) -> None:
@@ -84,7 +84,7 @@ class AnalysisConfig:
         return self.__get_position_keys(self.log_data)
 
     def __get_position_keys(self, position):
-        default_keys = ["eof_info", "box", "next", "extract"]
+        default_keys = ["eof_info", "box", "next", "extract", "statusCode", "statusInfo"]
         ret = list()
         for k in position:
             if k not in default_keys:
@@ -167,36 +167,40 @@ class LogAnalysis:
 
     def log_analysis(self, line_str):
         #print("INPUT DATA: ", line_str)
+        self.step_result = None
         for plug in self.plug_list:
             result = plug.analysis(line_str)
             if result != None:
                 self.step_result = result
-                print("analysis result: ", result)
+                #print("analysis result: ", result)
                 break
         if self.step_result == None:
             return None
-        elif 'result' in self.step_result and self.step_result['result']['statusInfo'] == 0:
+        elif 'result' in self.step_result and self.step_result['result']['statusCode'] == 0:
             #插件运行一轮结束，结果为成功；更新plug_list到下一个
             self.file_list_index += 1
             if self.file_list_index >= len(self.file_list):
                 #插件列表已经到结尾，从头开始
                 self.file_list_index = 0
             self.log_plug_update(self.file_list_index)
-        elif 'result' in self.step_result and self.step_result['result']['statusInfo'] != 0:
+            print("RESULT: ", self.step_result)
+        elif 'result' in self.step_result and self.step_result['result']['statusCode'] != 0:
             #插件运行一轮结束，结果为失败；一轮整体分析流程结束，从头开始
             self.file_list_index = 0
             self.log_plug_update(self.file_list_index)
+            print("RESULT: ", self.step_result)
         elif 'key' in self.step_result:
             #命中了此插件的一个流程分支，但是未到最终流程
+            print("MARK: ", self.step_result)
             pass
         return self.step_result
 
 if __name__=="__main__":
-    """
     if len(sys.argv) < 2:
-        print("usage: log_analysis file")
+        print("usage: log_analysis json_file log_file")
         exit()
 
+    """
     fc = FileConvert()
     fc.xmind2json("./source/device_control.xmind", "./source/device_control.json")
     q = queue.Queue(10240)
@@ -211,11 +215,14 @@ if __name__=="__main__":
         file_log = FileDataRead(file_path, queue=q)
         file_log.run()
     """
-    file_path = "./log_dir/orb.log"
-    file_log = FileDataRead(file_path)
-    file_log.run()
+    #file_path = "./log_dir/orb.log"
+    file_path = sys.argv[2]
+    file_log = FileDataRead()
+    file_log.init(file_path)
+    file_log.start()
 
-    source_path = "./source/device_control.json"
+    #source_path = "./source/device_control.json"
+    source_path = sys.argv[1]
     print("source_path ", source_path)
     param = list()
     first_node = set()
@@ -226,9 +233,6 @@ if __name__=="__main__":
     count = 0
     fd = open("./time_test.txt", "a+")
     while True:
-        """
-        analysis.run()
-        """
         log_str = file_log.get()
         count = count + 1
         if log_str != 'EOF':
@@ -242,3 +246,4 @@ if __name__=="__main__":
             s = "line number: " + str(count) + ", time use: " + str(time_use) + "s, time use per line:" + str(time_use_per_line) + "us\n"
             fd.write(s)
             break
+    file_log.quit()

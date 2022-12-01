@@ -45,6 +45,7 @@ class DataInput:
 
     def _read_data(self):
         while True:
+            #print("thread run", self.stop_flag, self.pause_flag)
             if self.stop_flag == 1:
                 break
             if self.pause_flag == 1:
@@ -53,8 +54,9 @@ class DataInput:
             #print("read data: ", data)
             if not data:
                 break
-            else:
-                self.put(data)
+            self.put(data)
+            if data == 'EOF':
+                break
         print("thread run break")
 
     def run(self):
