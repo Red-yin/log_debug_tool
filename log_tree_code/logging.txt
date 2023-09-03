@@ -1,0 +1,8 @@
+[INFO][log_info_extraction.py:62] 0:[22-08-24 18:11:53.654][session INFO][device_control]RECV DEVICE CTRL CMD{"property":"风速","operate":"set","deviceType":"空调","mode":"自动风","duiWidget":"text","intent":"模式调节","roomName":null,"property_type":null}
+
+[INFO][log_info_extraction.py:63] find key: [RECV DEVICE CTRL CMD]
+[INFO][xmind_to_log_tree.py:37] update RECV DEVICE CTRL CMD in branch root
+[INFO][log_info_extraction.py:62] 1:[22-08-24 18:11:53.670][session ERROR][device_control]SEARCH DEVICE FAILED
+
+[INFO][log_info_extraction.py:63] find key: [[device_control]SEARCH DEVICE FAILED]
+[INFO][xmind_to_log_tree.py:47] [device_control]SEARCH DEVICE FAILED is the end of branch

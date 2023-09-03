@@ -1,1 +1,107 @@
-{"RECV DEVICE CTRL CMD": {"INTENT PARAM ERROR": {"extract": {"statusInfo": "语音参数异常", "statusCode": 100, "solve": "多轮对话和扫地机区域清扫意图会进入本流程"}}, "1_001_01_01": {"extract": {"statusInfo": "房间不存在", "statusCode": 101, "solve": "检查APP中是否存在本房间名称，若存在，是vifamily数据异常"}}, "1_001_01_02": {"extract": {"statusInfo": "楼层不存在", "statusCode": 102, "solve": "检查APP中是否存在本楼层名称，若存在，是vifamily数据异常"}}, "dev number:": {"search_device\",\"errCode\":-1": {"extract": {"statusInfo": "未搜索到设备", "statusCode": 103, "solve": "确认APP中是否存在被控设备，若存在，是vifamily数据异常"}}, "search_device\",\"errCode\":-2": {"extract": {"statusInfo": "设备不支持这个属性", "statusCode": 104, "solve": "一般情况下是正常流程，若与实际设备功能不符，请反馈给研发人员"}}, "search_device\",\"errCode\":-3": {"extract": {"statusInfo": "设备不支持这个操作", "statusCode": 105, "solve": "一般情况下是正常流程，若与实际设备功能不符，请反馈给研发人员"}}, "search_device\",\"errCode\":-4": {"extract": {"statusInfo": "设备不支持这个意图", "statusCode": 106, "solve": "一般情况下是正常流程，若与实际设备功能不符，请反馈给研发人员"}}, "DEVICE FILTER FAILED": {"extract": {"statusInfo": "没有符合控制条件的设备", "statusCode": 107, "solve": "是正常流程，若与预期不符，请检查被控设备的位置、状态信息，若与实际不符，请重启设备"}}, "CMD PRETREATMENT FAILED": {"extract": {"statusInfo": "控制命令和设备类型不匹配", "statusCode": 108, "solve": "异常流程，需要研发人员分析"}}, "CTRL DEV NUM :": {"device ctrl:": {"ctrl errCode: 0": {"extract": {"statusInfo": "控制成功", "statusCode": 0, "solve": "正常流程"}}, "control error:": {"extract": {"statusInfo": "控制失败", "statusCode": 109, "solve": "控制设备失败，需要联系vifamily维护人员分析"}}, "dds handle timeout": {"extract": {"statusInfo": "控制失败", "statusCode": 110, "solve": "控制设备结果返回超时，需要联系vifamily维护人员分析"}}}}}, "[device_control]SEARCH DEVICE FAILED": {"extract": {"statusInfo": "搜索设备失败", "statusCode": 111, "solve": "搜索设备没有预期结果，需要联系vifamily维护人员分析"}}}, "eof_info": {"extract": {"statusInfo": "EOF:本次不为新版本设备控制", "statusCode": 999}}}
+{
+    "RECV DEVICE CTRL CMD": {
+        "INTENT PARAM ERROR": {
+            "extract": {
+                "statusInfo": "语音参数异常",
+                "statusCode": 100,
+                "solve": "多轮对话和扫地机区域清扫意图会进入本流程"
+            }
+        },
+        "1_001_01_01": {
+            "extract": {
+                "statusInfo": "房间不存在",
+                "statusCode": 101,
+                "solve": "检查APP中是否存在本房间名称，若存在，是vifamily数据异常"
+            }
+        },
+        "1_001_01_02": {
+            "extract": {
+                "statusInfo": "楼层不存在",
+                "statusCode": 102,
+                "solve": "检查APP中是否存在本楼层名称，若存在，是vifamily数据异常"
+            }
+        },
+        "dev number:": {
+            "search_device\",\"errCode\":-1": {
+                "extract": {
+                    "statusInfo": "未搜索到设备",
+                    "statusCode": 103,
+                    "solve": "确认APP中是否存在被控设备，若存在，是vifamily数据异常"
+                }
+            },
+            "search_device\",\"errCode\":-2": {
+                "extract": {
+                    "statusInfo": "设备不支持这个属性",
+                    "statusCode": 104,
+                    "solve": "一般情况下是正常流程，若与实际设备功能不符，请反馈给研发人员"
+                }
+            },
+            "search_device\",\"errCode\":-3": {
+                "extract": {
+                    "statusInfo": "设备不支持这个操作",
+                    "statusCode": 105,
+                    "solve": "一般情况下是正常流程，若与实际设备功能不符，请反馈给研发人员"
+                }
+            },
+            "search_device\",\"errCode\":-4": {
+                "extract": {
+                    "statusInfo": "设备不支持这个意图",
+                    "statusCode": 106,
+                    "solve": "一般情况下是正常流程，若与实际设备功能不符，请反馈给研发人员"
+                }
+            },
+            "DEVICE FILTER FAILED": {
+                "extract": {
+                    "statusInfo": "没有符合控制条件的设备",
+                    "statusCode": 107,
+                    "solve": "是正常流程，若与预期不符，请检查被控设备的位置、状态信息，若与实际不符，请重启设备"
+                }
+            },
+            "CMD PRETREATMENT FAILED": {
+                "extract": {
+                    "statusInfo": "控制命令和设备类型不匹配",
+                    "statusCode": 108,
+                    "solve": "异常流程，需要研发人员分析"
+                }
+            },
+            "CTRL DEV NUM :": {
+                "device ctrl:": {
+                    "ctrl errCode: 0": {
+                        "extract": {
+                            "statusInfo": "控制成功",
+                            "statusCode": 0,
+                            "solve": "正常流程"
+                        }
+                    },
+                    "control error:": {
+                        "extract": {
+                            "statusInfo": "控制失败",
+                            "statusCode": 109,
+                            "solve": "控制设备失败，需要联系vifamily维护人员分析"
+                        }
+                    },
+                    "dds handle timeout": {
+                        "extract": {
+                            "statusInfo": "控制失败",
+                            "statusCode": 110,
+                            "solve": "控制设备结果返回超时，需要联系vifamily维护人员分析"
+                        }
+                    }
+                }
+            }
+        },
+        "[device_control]SEARCH DEVICE FAILED": {
+            "extract": {
+                "statusInfo": "搜索设备失败",
+                "statusCode": 111,
+                "solve": "搜索设备没有预期结果，需要联系vifamily维护人员分析"
+            }
+        }
+    },
+    "eof_info": {
+        "extract": {
+            "statusInfo": "EOF:本次不为新版本设备控制",
+            "statusCode": 999
+        }
+    }
+}

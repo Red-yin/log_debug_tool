@@ -2,14 +2,58 @@
 
 from xmindparser import xmind_to_dict
 from icecream import ic 
+import logging
+logging.basicConfig(level=logging.DEBUG, format='%(asctime)s - %(name)s - %(levelname)s - %(message)s')
 import os
 import sys
 
 TITLE = "title"
 TOPICS = "topics"
 
-log_tree = [{TITLE:"a",TOPICS:[{TITLE:"b", TOPICS:[{TITLE:"c"}]}]}, {TITLE:"1",TOPICS:[{TITLE:"2"}, {TITLE:"3"}]}]
+log_tree_example = {TITLE:"root",TOPICS:[{TITLE:"a",TOPICS:[{TITLE:"b", TOPICS:[{TITLE:"c"}]}]}, {TITLE:"1",TOPICS:[{TITLE:"2"}, {TITLE:"3"}]}]}
 line_list = ["abc", "bd", "cfg"]
+
+class LogTree:
+    def __init__(self, log_tree:dict) -> None:
+        logging.debug("LogTree init by dict: %s", log_tree)
+        self.root = log_tree
+        self.current_position = log_tree
+        self._current_keys = list() 
+        self._update_current_keys()
+    def get_current_keys(self) -> list:
+        return self._current_keys
+    def _update_current_keys(self) -> None:
+        self._current_keys.clear()
+        if isinstance(self.current_position, dict):
+            if TITLE in self.current_position:
+                self._current_keys.append(self.current_position[TITLE])
+        elif isinstance(self.current_position, list):
+            for item in self.current_position:
+                if TITLE in item:
+                    self._current_keys.append(item[TITLE])
+    def update_position(self, key:str):
+        if isinstance(self.current_position, dict):
+            if TOPICS in self.current_position:
+                logging.info("update %s in branch root", key)
+                self.current_position = self.current_position[TOPICS]
+                self._update_current_keys()
+        elif isinstance(self.current_position, list):
+            for item in self.current_position:
+                if TITLE in item and item[TITLE] == key:
+                    if TOPICS in self.current_position:
+                        logging.info("update in %s branch", key)
+                        self.current_position = self.current_position[TOPICS]
+                    else:
+                        logging.info("%s is the end of branch", key)
+                        self.current_position = self.root
+                    self._update_current_keys()
+                    break
+    def split_branch(self) -> list:
+        log_tree_list = list()
+        if TOPICS in self.root:
+            for item in self.root[TOPICS]:
+                log_tree_list.append(LogTree(item))
+        return log_tree_list
 
 def get_xmind_data(xmind_node:list)->list:
     if not isinstance(xmind_node, list):
@@ -25,7 +69,8 @@ def get_xmind_data(xmind_node:list)->list:
     return data_list
 
 def xmind_list_to_log_tree(xmind_list:list)->list:
-    return get_xmind_data(xmind_list[0]["topic"][TOPICS])
+    # return get_xmind_data(xmind_list[0]["topic"][TOPICS])
+    return xmind_list[0]["topic"]
 
 def xmind_file_to_log_tree(file_path:str)->list:
     if not os.path.exists(file_path):
