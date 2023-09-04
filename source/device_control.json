@@ -1,107 +1,213 @@
-{
-    "RECV DEVICE CTRL CMD": {
-        "INTENT PARAM ERROR": {
-            "extract": {
-                "statusInfo": "语音参数异常",
-                "statusCode": 100,
-                "solve": "多轮对话和扫地机区域清扫意图会进入本流程"
-            }
-        },
-        "1_001_01_01": {
-            "extract": {
-                "statusInfo": "房间不存在",
-                "statusCode": 101,
-                "solve": "检查APP中是否存在本房间名称，若存在，是vifamily数据异常"
-            }
-        },
-        "1_001_01_02": {
-            "extract": {
-                "statusInfo": "楼层不存在",
-                "statusCode": 102,
-                "solve": "检查APP中是否存在本楼层名称，若存在，是vifamily数据异常"
-            }
-        },
-        "dev number:": {
-            "search_device\",\"errCode\":-1": {
-                "extract": {
-                    "statusInfo": "未搜索到设备",
-                    "statusCode": 103,
-                    "solve": "确认APP中是否存在被控设备，若存在，是vifamily数据异常"
+[
+  {
+    "title": "\u753b\u5e03 1",
+    "topic": {
+      "title": "device_control",
+      "note": "\u6807\u7b7e\uff1aextract->statusInfo\r\n\u6279\u6ce8\uff1aextract->statusCode\r\n\u5907\u6ce8\uff1aextract->solve\r\n\u9ed8\u8ba4\u89c4\u5219\uff1a\u6839\u8282\u70b9(device_control)\u4e0d\u4f1a\u8f6c\u6362\u5230json\u6570\u636e\u4e2d",
+      "topics": [
+        {
+          "title": "RECV DEVICE CTRL CMD",
+          "topics": [
+            {
+              "title": "INTENT PARAM ERROR",
+              "comment": [
+                {
+                  "author": "Administrator",
+                  "content": "100"
                 }
+              ],
+              "note": "\u591a\u8f6e\u5bf9\u8bdd\u548c\u626b\u5730\u673a\u533a\u57df\u6e05\u626b\u610f\u56fe\u4f1a\u8fdb\u5165\u672c\u6d41\u7a0b",
+              "labels": [
+                "\u8bed\u97f3\u53c2\u6570\u5f02\u5e38"
+              ]
             },
-            "search_device\",\"errCode\":-2": {
-                "extract": {
-                    "statusInfo": "设备不支持这个属性",
-                    "statusCode": 104,
-                    "solve": "一般情况下是正常流程，若与实际设备功能不符，请反馈给研发人员"
+            {
+              "title": "1_001_01_01",
+              "comment": [
+                {
+                  "author": "Administrator",
+                  "content": "101"
                 }
+              ],
+              "note": "\u68c0\u67e5APP\u4e2d\u662f\u5426\u5b58\u5728\u672c\u623f\u95f4\u540d\u79f0\uff0c\u82e5\u5b58\u5728\uff0c\u662fvifamily\u6570\u636e\u5f02\u5e38",
+              "labels": [
+                "\u623f\u95f4\u4e0d\u5b58\u5728"
+              ]
             },
-            "search_device\",\"errCode\":-3": {
-                "extract": {
-                    "statusInfo": "设备不支持这个操作",
-                    "statusCode": 105,
-                    "solve": "一般情况下是正常流程，若与实际设备功能不符，请反馈给研发人员"
+            {
+              "title": "1_001_01_02",
+              "comment": [
+                {
+                  "author": "Administrator",
+                  "content": "102"
                 }
+              ],
+              "note": "\u68c0\u67e5APP\u4e2d\u662f\u5426\u5b58\u5728\u672c\u697c\u5c42\u540d\u79f0\uff0c\u82e5\u5b58\u5728\uff0c\u662fvifamily\u6570\u636e\u5f02\u5e38",
+              "labels": [
+                "\u697c\u5c42\u4e0d\u5b58\u5728"
+              ]
             },
-            "search_device\",\"errCode\":-4": {
-                "extract": {
-                    "statusInfo": "设备不支持这个意图",
-                    "statusCode": 106,
-                    "solve": "一般情况下是正常流程，若与实际设备功能不符，请反馈给研发人员"
-                }
-            },
-            "DEVICE FILTER FAILED": {
-                "extract": {
-                    "statusInfo": "没有符合控制条件的设备",
-                    "statusCode": 107,
-                    "solve": "是正常流程，若与预期不符，请检查被控设备的位置、状态信息，若与实际不符，请重启设备"
-                }
-            },
-            "CMD PRETREATMENT FAILED": {
-                "extract": {
-                    "statusInfo": "控制命令和设备类型不匹配",
-                    "statusCode": 108,
-                    "solve": "异常流程，需要研发人员分析"
-                }
-            },
-            "CTRL DEV NUM :": {
-                "device ctrl:": {
-                    "ctrl errCode: 0": {
-                        "extract": {
-                            "statusInfo": "控制成功",
-                            "statusCode": 0,
-                            "solve": "正常流程"
-                        }
-                    },
-                    "control error:": {
-                        "extract": {
-                            "statusInfo": "控制失败",
-                            "statusCode": 109,
-                            "solve": "控制设备失败，需要联系vifamily维护人员分析"
-                        }
-                    },
-                    "dds handle timeout": {
-                        "extract": {
-                            "statusInfo": "控制失败",
-                            "statusCode": 110,
-                            "solve": "控制设备结果返回超时，需要联系vifamily维护人员分析"
-                        }
+            {
+              "title": "dev number:",
+              "topics": [
+                {
+                  "title": "search_device\",\"errCode\":-1",
+                  "comment": [
+                    {
+                      "author": "Administrator",
+                      "content": "103"
                     }
+                  ],
+                  "note": "\u786e\u8ba4APP\u4e2d\u662f\u5426\u5b58\u5728\u88ab\u63a7\u8bbe\u5907\uff0c\u82e5\u5b58\u5728\uff0c\u662fvifamily\u6570\u636e\u5f02\u5e38",
+                  "labels": [
+                    "\u672a\u641c\u7d22\u5230\u8bbe\u5907"
+                  ]
+                },
+                {
+                  "title": "search_device\",\"errCode\":-2",
+                  "comment": [
+                    {
+                      "author": "Administrator",
+                      "content": "104"
+                    }
+                  ],
+                  "note": "\u4e00\u822c\u60c5\u51b5\u4e0b\u662f\u6b63\u5e38\u6d41\u7a0b\uff0c\u82e5\u4e0e\u5b9e\u9645\u8bbe\u5907\u529f\u80fd\u4e0d\u7b26\uff0c\u8bf7\u53cd\u9988\u7ed9\u7814\u53d1\u4eba\u5458",
+                  "labels": [
+                    "\u8bbe\u5907\u4e0d\u652f\u6301\u8fd9\u4e2a\u5c5e\u6027"
+                  ]
+                },
+                {
+                  "title": "search_device\",\"errCode\":-3",
+                  "comment": [
+                    {
+                      "author": "Administrator",
+                      "content": "105"
+                    }
+                  ],
+                  "note": "\u4e00\u822c\u60c5\u51b5\u4e0b\u662f\u6b63\u5e38\u6d41\u7a0b\uff0c\u82e5\u4e0e\u5b9e\u9645\u8bbe\u5907\u529f\u80fd\u4e0d\u7b26\uff0c\u8bf7\u53cd\u9988\u7ed9\u7814\u53d1\u4eba\u5458",
+                  "labels": [
+                    "\u8bbe\u5907\u4e0d\u652f\u6301\u8fd9\u4e2a\u64cd\u4f5c"
+                  ]
+                },
+                {
+                  "title": "search_device\",\"errCode\":-4",
+                  "comment": [
+                    {
+                      "author": "Administrator",
+                      "content": "106"
+                    }
+                  ],
+                  "note": "\u4e00\u822c\u60c5\u51b5\u4e0b\u662f\u6b63\u5e38\u6d41\u7a0b\uff0c\u82e5\u4e0e\u5b9e\u9645\u8bbe\u5907\u529f\u80fd\u4e0d\u7b26\uff0c\u8bf7\u53cd\u9988\u7ed9\u7814\u53d1\u4eba\u5458",
+                  "labels": [
+                    "\u8bbe\u5907\u4e0d\u652f\u6301\u8fd9\u4e2a\u610f\u56fe"
+                  ]
+                },
+                {
+                  "title": "DEVICE FILTER FAILED",
+                  "comment": [
+                    {
+                      "author": "Administrator",
+                      "content": "107"
+                    }
+                  ],
+                  "note": "\u662f\u6b63\u5e38\u6d41\u7a0b\uff0c\u82e5\u4e0e\u9884\u671f\u4e0d\u7b26\uff0c\u8bf7\u68c0\u67e5\u88ab\u63a7\u8bbe\u5907\u7684\u4f4d\u7f6e\u3001\u72b6\u6001\u4fe1\u606f\uff0c\u82e5\u4e0e\u5b9e\u9645\u4e0d\u7b26\uff0c\u8bf7\u91cd\u542f\u8bbe\u5907",
+                  "labels": [
+                    "\u6ca1\u6709\u7b26\u5408\u63a7\u5236\u6761\u4ef6\u7684\u8bbe\u5907"
+                  ]
+                },
+                {
+                  "title": "CMD PRETREATMENT FAILED",
+                  "comment": [
+                    {
+                      "author": "Administrator",
+                      "content": "108"
+                    }
+                  ],
+                  "note": "\u5f02\u5e38\u6d41\u7a0b\uff0c\u9700\u8981\u7814\u53d1\u4eba\u5458\u5206\u6790",
+                  "labels": [
+                    "\u63a7\u5236\u547d\u4ee4\u548c\u8bbe\u5907\u7c7b\u578b\u4e0d\u5339\u914d"
+                  ]
+                },
+                {
+                  "title": "CTRL DEV NUM :",
+                  "topics": [
+                    {
+                      "title": "device ctrl:",
+                      "topics": [
+                        {
+                          "title": "ctrl errCode: 0",
+                          "comment": [
+                            {
+                              "author": "Administrator",
+                              "content": "0"
+                            }
+                          ],
+                          "note": "\u6b63\u5e38\u6d41\u7a0b",
+                          "labels": [
+                            "\u63a7\u5236\u6210\u529f"
+                          ]
+                        },
+                        {
+                          "title": "control error:",
+                          "comment": [
+                            {
+                              "author": "Administrator",
+                              "content": "109"
+                            }
+                          ],
+                          "note": "\u63a7\u5236\u8bbe\u5907\u5931\u8d25\uff0c\u9700\u8981\u8054\u7cfbvifamily\u7ef4\u62a4\u4eba\u5458\u5206\u6790",
+                          "labels": [
+                            "\u63a7\u5236\u5931\u8d25"
+                          ]
+                        },
+                        {
+                          "title": "dds handle timeout",
+                          "comment": [
+                            {
+                              "author": "Administrator",
+                              "content": "110"
+                            }
+                          ],
+                          "note": "\u63a7\u5236\u8bbe\u5907\u7ed3\u679c\u8fd4\u56de\u8d85\u65f6\uff0c\u9700\u8981\u8054\u7cfbvifamily\u7ef4\u62a4\u4eba\u5458\u5206\u6790",
+                          "labels": [
+                            "\u63a7\u5236\u5931\u8d25"
+                          ]
+                        }
+                      ]
+                    }
+                  ]
                 }
+              ]
+            },
+            {
+              "title": "[device_control]SEARCH DEVICE FAILED",
+              "comment": [
+                {
+                  "author": "Administrator",
+                  "content": "111"
+                }
+              ],
+              "note": "\u641c\u7d22\u8bbe\u5907\u6ca1\u6709\u9884\u671f\u7ed3\u679c\uff0c\u9700\u8981\u8054\u7cfbvifamily\u7ef4\u62a4\u4eba\u5458\u5206\u6790",
+              "labels": [
+                "\u641c\u7d22\u8bbe\u5907\u5931\u8d25"
+              ]
             }
+          ]
         },
-        "[device_control]SEARCH DEVICE FAILED": {
-            "extract": {
-                "statusInfo": "搜索设备失败",
-                "statusCode": 111,
-                "solve": "搜索设备没有预期结果，需要联系vifamily维护人员分析"
+        {
+          "title": "eof_info",
+          "comment": [
+            {
+              "author": "Administrator",
+              "content": "999"
             }
+          ],
+          "labels": [
+            "EOF:\u672c\u6b21\u4e0d\u4e3a\u65b0\u7248\u672c\u8bbe\u5907\u63a7\u5236"
+          ]
         }
+      ]
     },
-    "eof_info": {
-        "extract": {
-            "statusInfo": "EOF:本次不为新版本设备控制",
-            "statusCode": 999
-        }
-    }
-}
+    "structure": "org.xmind.ui.map.clockwise"
+  }
+]

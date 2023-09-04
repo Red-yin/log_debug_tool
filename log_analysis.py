@@ -13,15 +13,20 @@ import sys
 class AnalysisConfig:
     def __init__(self, file_path) -> None:
         self.file_path = file_path
-        self.log_data = self.analysis_source_load(file_path)
-        self.update_current_position()
+        self.analysis_source_load(file_path)
+        self._update_current_position()
+
+    def update(self, file_path) -> None:
+        self.file_path = file_path
+        self.analysis_source_load(file_path)
+        self._update_current_position()
 
     def analysis(self, content:str):
-        key_list = self.get_current_keys()
+        key_list = self._get_current_keys()
         #print(key_list)
         if len(key_list) == 0:
-            self.log_analysis_end()
-            key_list = self.get_current_keys()
+            self._log_analysis_end()
+            key_list = self._get_current_keys()
         for key in key_list:
             ret = content.find(key)
             #结果分类：1.content不包含key；
@@ -30,12 +35,12 @@ class AnalysisConfig:
             # 4.content包含key，且key是中间节点；
             if ret != -1:
                 print(content)
-                self.update_current_position(key)
-                if self.is_position_end():
+                self._update_current_position(key)
+                if self._is_position_end():
                     #结果分类2和3
                     ret = dict()
                     ret['key'] = key
-                    ret['result'] = self.current_result()
+                    ret['result'] = self._current_result()
                     return ret
                 else:
                     #结果分类4
@@ -45,13 +50,13 @@ class AnalysisConfig:
         #结果分类1
         return None
 
-    def is_position_end(self) -> bool:
-        key_list = self.get_current_keys()
+    def _is_position_end(self) -> bool:
+        key_list = self._get_current_keys()
         if len(key_list) > 0:
             return False
         else:
             return True
-    def update_current_position(self, key=None):
+    def _update_current_position(self, key=None):
         if key == None:
             self.current_position = self.log_data
         else:
@@ -66,21 +71,21 @@ class AnalysisConfig:
             else:
                 print("ERROR:", key, "is not exist in ", self.current_position)
     def analysis_source_load(self, file_path):
-        data = self.__data_loader(file_path)
-        return data
+        self.log_data = self.__data_loader(file_path)
+        return 
         if self.__data_check(data) == 0:
             return data
         else:
             return None
 
-    def get_current_keys(self):
+    def _get_current_keys(self):
         key_list = self.__get_position_keys(self.current_position)
         if len(key_list) > 0 and self.current_position != self.log_data:
             #获取trigger关键字
             key_list += self.__get_position_keys(self.log_data)
         return key_list 
 
-    def get_trigger_keys(self):
+    def _get_trigger_keys(self):
         return self.__get_position_keys(self.log_data)
 
     def __get_position_keys(self, position):
@@ -91,13 +96,13 @@ class AnalysisConfig:
                 ret.append(k)
         return ret
 
-    def current_result(self):
+    def _current_result(self):
         return self.current_position['extract']
 
-    def log_analysis_end(self):
+    def _log_analysis_end(self):
         if "extract" in self.current_position:
             print("result:", self.current_position['extract']['statusInfo'])
-        self.update_current_position()
+        self._update_current_position()
 
     def __data_loader(self, file_path):
         with open(file_path, 'r', errors='ignore', encoding='utf-8') as f:

@@ -6,3 +6,6 @@ __pycache__/adb_run.cpython-310.pyc
 __pycache__/adb_run.cpython-310.pyc
 __pycache__/file_read.cpython-310.pyc
 gui/__pycache__/window_xmind2json.cpython-310.pyc
+__pycache__/adb_run.cpython-310.pyc
+*.pyc
+*.pyc

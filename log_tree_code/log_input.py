@@ -2,7 +2,7 @@
 import os
 # from icecream import ic 
 import logging
-logging.basicConfig(level=logging.INFO, filename="logging.txt", format='[%(levelname)s][%(filename)s:%(lineno)s] %(message)s')
+logging.basicConfig(level=logging.INFO, format='[%(levelname)s][%(filename)s:%(lineno)s] %(message)s')
 from enum import Enum
 import sys  #used in main for test
 from log_info_extraction import LogInfoExtraction #used in main for test
@@ -74,7 +74,7 @@ class LogInput:
         return (data_str, LogReadError.SUCCESS)
 
 if __name__=="__main__":
-    if len(sys.argv) < 2:
+    if len(sys.argv) < 3:
         # print("usage: log_input.py input_path")
         logging.error("usage: log_input.py input.xmind input.log")
         exit()
