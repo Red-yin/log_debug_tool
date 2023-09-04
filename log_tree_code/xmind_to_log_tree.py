@@ -40,9 +40,9 @@ class LogTree:
         elif isinstance(self.current_position, list):
             for item in self.current_position:
                 if TITLE in item and item[TITLE] == key:
-                    if TOPICS in self.current_position:
+                    if TOPICS in item:
                         logging.info("update in %s branch", key)
-                        self.current_position = self.current_position[TOPICS]
+                        self.current_position = item[TOPICS]
                     else:
                         logging.info("%s is the end of branch", key)
                         self.current_position = self.root
