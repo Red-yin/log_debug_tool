@@ -31,6 +31,9 @@ class LogTree:
             for item in self.current_position:
                 if TITLE in item:
                     self._current_keys.append(item[TITLE])
+    def _is_leaf(self, node:dict) -> bool:
+        return not TOPICS in node
+
     def update_position(self, key:str):
         if isinstance(self.current_position, dict):
             if TOPICS in self.current_position:
@@ -40,12 +43,12 @@ class LogTree:
         elif isinstance(self.current_position, list):
             for item in self.current_position:
                 if TITLE in item and item[TITLE] == key:
-                    if TOPICS in item:
-                        logging.info("update in %s branch", key)
-                        self.current_position = item[TOPICS]
-                    else:
+                    if self._is_leaf(item):
                         logging.info("%s is the end of branch", key)
                         self.current_position = self.root
+                    else:
+                        logging.info("update in %s branch", key)
+                        self.current_position = item[TOPICS]
                     self._update_current_keys()
                     break
     def split_branch(self) -> list:
@@ -54,6 +57,14 @@ class LogTree:
             for item in self.root[TOPICS]:
                 log_tree_list.append(LogTree(item))
         return log_tree_list
+    def key_info_in_current_position(self, key:str) ->dict:
+        if isinstance(self.current_position, dict):
+            if self.current_position[TITLE] == key:
+                return self.current_position
+        elif isinstance(self.current_position, list):
+            for item in self.current_position:
+                if item[TITLE] == key:
+                    return item
 
 def get_xmind_data(xmind_node:list)->list:
     if not isinstance(xmind_node, list):

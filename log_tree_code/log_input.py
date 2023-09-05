@@ -6,6 +6,7 @@ logging.basicConfig(level=logging.INFO, format='[%(levelname)s][%(filename)s:%(l
 from enum import Enum
 import sys  #used in main for test
 from log_info_extraction import LogInfoExtraction #used in main for test
+from log_info_extraction import LogInfoLevel    #used in main for test
 from xmind_to_log_tree import xmind_file_to_log_tree
 
 class LogReadError(Enum):
@@ -86,8 +87,9 @@ if __name__=="__main__":
         (data, errno) = input_data.readline()
         if errno == LogReadError.SUCCESS:
             logging.debug("read data: %s", data)
-            lie.analysis(data)
-            pass
+            (level, desc) = lie.analysis(data)
+            if level is not LogInfoLevel.IGNORE:
+                logging.info("[%s] %s", level, desc)
         elif errno == LogReadError.EOF:
             logging.debug("file end")
         elif errno == LogReadError.EOD:
